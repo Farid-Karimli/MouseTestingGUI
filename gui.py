@@ -9,11 +9,13 @@ log = open("log.txt", "w+")
 
 global fits
 fits = None
+selection_coordinates = []
 
 window = tk.Tk()
 window.title("Testing GUI")
 width = 700
 height = 590
+
 
 def distance(x1, y1, x2, y2):
     return ((x1-x2)**2 + (y1-y2)**2)**0.5
@@ -25,7 +27,10 @@ def place_button_randomly():
 
     # Calculate Fits Law
     print("Fits Law: " + str(fits.calculate_original_law(checkpoint)))
-
+    x,y = window.winfo_pointerx(), window.winfo_pointery()
+    fits.select = x,y
+    #print it
+    fits.update()
     # Get button's current x and y coordinates
     x,y = button.winfo_rootx(), button.winfo_rooty()
     try: 
@@ -37,6 +42,8 @@ def place_button_randomly():
 
     fits.target_width = 8
     fits.distance_to_target = distance(x, y, random_x, random_y)
+    fits.f = x,y 
+
     button.place(x=random_x, y=random_y, anchor="center")
 
 def increase_size():
@@ -57,6 +64,13 @@ def start_test():
     dist = distance(x, y, width//2, 50)
     global fits
     fits = FitsLaw(8, dist)
+    fits.f = (x,y)
+
+def reset(event):
+    print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
+    button.place_forget()
+    start_button.place(x=width//2, y=height//2+75, anchor="center")
+
 
 
 button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="white", font=("Arial", 15),command=place_button_randomly)
@@ -64,26 +78,21 @@ button = tk.Button(window, text="Target", width=8, height=2, highlightbackground
 start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20),command=start_test)
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
-'''settings = Frame(window)
-settings.place(x=width//2, y=height//2+150, anchor="center")'''
-
-'''size_label = Label(settings, text="Target size", font=("Arial", 15))
-size_label.grid(row=0, column=1, padx=5, pady=5)
-size_decrease = Button(settings, text="-", width=2, height=1, font=("Arial", 15), command=decrease_size)
-size_decrease.grid(row=0, column=0, padx=5, pady=5)
-size_increase = Button(settings, text="+", width=2, height=1, font=("Arial", 15), command=increase_size)
-size_increase.grid(row=0, column=2, padx=5, pady=5)'''
-
-
 def mouseover(event):
-    log.write("Mouseover " + str(timer.checkpoint()) + "\n")
+    checkpoint = timer.checkpoint()
+    fits.to = button.winfo_rootx(), button.winfo_rooty()
+    # print it 
+    log.write("Mouseover " + str(checkpoint) + "\n")
 
 def key(event):
     window.event_generate('<Motion>', warp=True, x=width//2, y=height//2)
 
 window.bind('<space>', key)
+# Bind the reset funtion to clicking q
+window.bind('q', reset)
 
 button.bind("<Enter>", mouseover)
 
 window.geometry(f'{width}x{height}-5+40')
 window.mainloop()
+
