@@ -3,4 +3,6 @@
 
   python gui.py 
 
+- Requires numpy
+
 
