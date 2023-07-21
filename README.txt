@@ -1,5 +1,5 @@
 To launch the app, run 
 
-''' 
-python gui.py 
-'''
+
+  python gui.py 
+
