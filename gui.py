@@ -49,22 +49,20 @@ def place_button_randomly():
     button.place(x=random_x, y=random_y, anchor="center")
 
 def remove_button(event):
+    checkpoint = timer.checkpoint()
+    print(checkpoint)
     global targets
 
     
-    targets += 1
-
-    
-
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     fits.to = event.widget.winfo_rootx(), event.widget.winfo_rooty()
     fits.select = x,y
-
     print(fits)
-
     fits.update()
-
     fits.f = x,y
+    fits.times += [checkpoint]
+
+    targets += 1
 
     if targets == 10:
         print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
@@ -104,7 +102,6 @@ def place_simple_targets():
             target = tk.Button(window, text="Target", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
             target.place(x=100*i, y=100*j, anchor="center")
             target.bind("<1>", remove_button)
-            target.bind("<Enter>", mouseover)
 
 
 def increase_size():
@@ -143,10 +140,7 @@ start_button = tk.Button(window, text="Start", width=10, height=2, highlightback
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
 def mouseover(event):
-    checkpoint = timer.checkpoint()
     fits.to = button.winfo_rootx(), button.winfo_rooty()
-    # print it 
-    log.write("Mouseover " + str(checkpoint) + "\n")
 
 def key(event):
     window.event_generate('<Motion>', warp=True, x=width//2, y=height//2)

@@ -20,6 +20,8 @@ class FitsLaw:
         self.ae = 0
         self.dx = 0
 
+        self.times = []
+
     def __repr__(self) -> str:
         return f"from: {self.f}\nto: {self.to}\nselect: {self.select}\n"
 
@@ -57,7 +59,7 @@ class FitsLaw:
         mean = np.mean(self.movement_amplitudes)
 
         ID = np.log2((mean/(4.133*std)) + 1)
-        MT = time
+        MT = np.mean(self.times)
 
         return ID/MT
 
