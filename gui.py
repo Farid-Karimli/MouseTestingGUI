@@ -3,6 +3,7 @@ from tkinter import *
 import random
 from timer import Timer
 from fits import FitsLaw
+import math
 
 timer = Timer()
 log = open("log.txt", "w+")
@@ -13,9 +14,10 @@ selection_coordinates = []
 
 window = tk.Tk()
 window.title("Testing GUI")
-width = 700
-height = 590
+width = 1000
+height = 800
 
+targets = 0
 
 def distance(x1, y1, x2, y2):
     return ((x1-x2)**2 + (y1-y2)**2)**0.5
@@ -26,7 +28,7 @@ def place_button_randomly():
     log.write("Click " + str(checkpoint) + "\n")
 
     # Calculate Fits Law
-    print("Fits Law: " + str(fits.calculate_original_law(checkpoint)))
+    # print("Fits Law: " + str(fits.calculate_original_law(checkpoint)))
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     fits.select = x,y
     #print it
@@ -46,6 +48,65 @@ def place_button_randomly():
 
     button.place(x=random_x, y=random_y, anchor="center")
 
+def remove_button(event):
+    global targets
+
+    
+    targets += 1
+
+    
+
+    x,y = window.winfo_pointerx(), window.winfo_pointery()
+    fits.to = event.widget.winfo_rootx(), event.widget.winfo_rooty()
+    fits.select = x,y
+
+    print(fits)
+
+    fits.update()
+
+    fits.f = x,y
+
+    if targets == 10:
+        print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
+        event.widget.place_forget()
+        return
+
+    event.widget.place_forget()
+
+# Places 10 buttons in a circle around the center of the screen
+def place_directional_targets():
+
+    top_left_corner = (width//2 , height//2 )
+    print("top left corner: ", top_left_corner)
+    # place button in top left corner
+    button.place(x=top_left_corner[0], y=top_left_corner[1], anchor="center")
+    
+    newbutton = tk.Button(window, text="New", width=10, height=2, highlightbackground='red', bg='green', fg="black", font=("Arial", 20))
+
+    # Places 3 buttons in a circle around the center of the screen 200 pixels away at 45 degree intervals
+    arc = 0
+    for i in range(3):
+        arc += 45
+        x = top_left_corner[0] + 200*math.cos(math.radians(arc))
+        y = top_left_corner[1] + 200*math.sin(math.radians(arc))
+        print("new x: ", x, "new y: ", y)
+
+        newbutton = tk.Button(window, text="New", width=8, height=2, highlightbackground='red', bg='green', fg="black", font=("Arial", 20))
+        newbutton.bind("<1>", remove_button)
+        newbutton.place(x=x, y=y, anchor="center")
+
+
+    
+def place_simple_targets():
+
+    for j in [2,4]:
+        for i in range(1,10,2):
+            target = tk.Button(window, text="Target", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
+            target.place(x=100*i, y=100*j, anchor="center")
+            target.bind("<1>", remove_button)
+            target.bind("<Enter>", mouseover)
+
+
 def increase_size():
     width = button.winfo_width()
     height = button.winfo_height()
@@ -58,13 +119,16 @@ def decrease_size():
 def start_test():
     timer.start()
     start_button.place_forget()
-    button.place(x=width//2, y=50, anchor="center")
     # Get cursor's current x and y coordinates
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     dist = distance(x, y, width//2, 50)
     global fits
     fits = FitsLaw(8, dist)
     fits.f = (x,y)
+    middle = (width//2 , height//2)
+    #button.place(x=middle[0], y=middle[1], anchor="center")
+
+    place_simple_targets()
 
 def reset(event):
     print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
@@ -73,7 +137,7 @@ def reset(event):
 
 
 
-button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="white", font=("Arial", 15),command=place_button_randomly)
+button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="white", font=("Arial", 15))
 
 start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20),command=start_test)
 start_button.place(x=width//2, y=height//2+75, anchor="center")
@@ -96,3 +160,4 @@ button.bind("<Enter>", mouseover)
 window.geometry(f'{width}x{height}-5+40')
 window.mainloop()
 
+print(fits.calculate_modified_law(timer.checkpoint()))

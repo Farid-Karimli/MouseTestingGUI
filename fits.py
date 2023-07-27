@@ -20,6 +20,9 @@ class FitsLaw:
         self.ae = 0
         self.dx = 0
 
+    def __repr__(self) -> str:
+        return f"from: {self.f}\nto: {self.to}\nselect: {self.select}\n"
+
     def calculate_original_law(self, time:float):
         ID = np.log2((self.distance_to_target)/self.target_width + 1)
         MT = time
@@ -43,7 +46,9 @@ class FitsLaw:
         self.calculate_c()
         dx:float = (self.c**2 - self.b**2 - self.a**2)/(2*self.a)
         self.movement_amplitudes += [self.a + dx]
+        #print(self.movement_amplitudes)
         self.selection_coordinates += [dx]
+        #print(self.selection_coordinates)
 
     def calculate_modified_law(self, time:float):
         # STD of dx
