@@ -22,6 +22,9 @@ class FitsLaw:
 
         self.times = []
 
+        self.ballistic_times = []
+        self.time_to_select = []
+
     def __repr__(self) -> str:
         return f"from: {self.f}\nto: {self.to}\nselect: {self.select}\n"
 
@@ -62,6 +65,10 @@ class FitsLaw:
         MT = np.mean(self.times)
 
         return ID/MT
+    
+
+    def get_average_times(self):
+        return np.mean(self.ballistic_times), np.mean(self.time_to_select)
 
 
 

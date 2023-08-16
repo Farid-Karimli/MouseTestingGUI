@@ -6,6 +6,7 @@ from fits import FitsLaw
 import math
 
 timer = Timer()
+timer2 = Timer()
 log = open("log.txt", "w+")
 
 global fits
@@ -49,15 +50,19 @@ def place_button_randomly():
     button.place(x=random_x, y=random_y, anchor="center")
 
 def remove_button(event):
-    checkpoint = timer.checkpoint()
-    print(checkpoint)
     global targets
-
+    
+    checkpoint = timer.checkpoint()
+    #print(checkpoint)
+    
+    click_checkpoint = timer2.checkpoint()
+    #print(click_checkpoint)
+    fits.time_to_select += [click_checkpoint]
     
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     fits.to = event.widget.winfo_rootx(), event.widget.winfo_rooty()
     fits.select = x,y
-    print(fits)
+    #print(fits)
     fits.update()
     fits.f = x,y
     fits.times += [checkpoint]
@@ -65,9 +70,9 @@ def remove_button(event):
     targets += 1
 
     if targets == 10:
-        print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
         event.widget.place_forget()
-        return
+        reset(None, True)
+
 
     event.widget.place_forget()
 
@@ -102,6 +107,8 @@ def place_simple_targets():
             target = tk.Button(window, text="Target", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
             target.place(x=100*i, y=100*j, anchor="center")
             target.bind("<1>", remove_button)
+            target.bind("<Enter>", mouseover)
+
 
 
 def increase_size():
@@ -112,25 +119,41 @@ def increase_size():
 def decrease_size():
     button.config(width=button.winfo_width()-1, height=button.winfo_height()-1)
 
-
 def start_test():
     timer.start()
+    timer2.start()
+
+    throughput_label.place_forget()
+    ballistic_time_label.place_forget()
+    select_time_label.place_forget()
     start_button.place_forget()
+    instructions.place_forget()
     # Get cursor's current x and y coordinates
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     dist = distance(x, y, width//2, 50)
     global fits
     fits = FitsLaw(8, dist)
     fits.f = (x,y)
-    middle = (width//2 , height//2)
-    #button.place(x=middle[0], y=middle[1], anchor="center")
-
+    
     place_simple_targets()
 
-def reset(event):
-    print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
+def reset(event, show_stats):
+    # print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
+    
     button.place_forget()
     start_button.place(x=width//2, y=height//2+75, anchor="center")
+
+    if show_stats:
+        stats = fits.get_average_times()
+        throughput = fits.calculate_modified_law(timer.checkpoint())
+
+        throughput_label.config(text=f"Throughput: {round(throughput,2)}")
+        ballistic_time_label.config(text=f"Average time to get to target: {round(stats[0],2)}ms")
+        select_time_label.config(text=f"Average time to select target: {round(stats[1],2)}ms")
+
+        throughput_label.place(x=width//2, y=height//2-110, anchor="center")
+        ballistic_time_label.place(x=width//2, y=height//2-75, anchor="center")
+        select_time_label.place(x=width//2, y=height//2-50, anchor="center")
 
 
 
@@ -139,8 +162,19 @@ button = tk.Button(window, text="Target", width=8, height=2, highlightbackground
 start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20),command=start_test)
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
+#Create label
+instructions = tk.Label(window, text="Click the start button below to start. Press q at any point to quit.", font=("Helvetica", 18))
+instructions.place(x=width//2, y=height//2-75, anchor="center")
+
+throughput_label = tk.Label(window, font=("Helvetica", 22))
+ballistic_time_label = tk.Label(window, font=("Helvetica", 18))
+select_time_label    = tk.Label(window, font=("Helvetica", 18))
+
 def mouseover(event):
-    fits.to = button.winfo_rootx(), button.winfo_rooty()
+    enter_checkpoint = timer2.checkpoint()
+    #print(enter_checkpoint)
+    fits.ballistic_times += [enter_checkpoint]
+
 
 def key(event):
     window.event_generate('<Motion>', warp=True, x=width//2, y=height//2)
@@ -153,5 +187,3 @@ button.bind("<Enter>", mouseover)
 
 window.geometry(f'{width}x{height}-5+40')
 window.mainloop()
-
-print(fits.calculate_modified_law(timer.checkpoint()))
