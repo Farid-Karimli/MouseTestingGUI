@@ -25,7 +25,6 @@ def distance(x1, y1, x2, y2):
 def place_button_randomly():
     # Record click
     checkpoint = timer.checkpoint()
-    log.write("Click " + str(checkpoint) + "\n")
 
     # Calculate Fits Law
     # print("Fits Law: " + str(fits.calculate_original_law(checkpoint)))
