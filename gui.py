@@ -7,7 +7,6 @@ import math
 
 timer = Timer()
 timer2 = Timer()
-log = open("log.txt", "w+")
 
 global fits
 fits = None
@@ -122,7 +121,7 @@ def decrease_size():
 def start_test():
     global targets
     targets = 0
-    
+
     timer.start()
     timer2.start()
 
