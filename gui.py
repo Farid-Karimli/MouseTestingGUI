@@ -120,6 +120,9 @@ def decrease_size():
     button.config(width=button.winfo_width()-1, height=button.winfo_height()-1)
 
 def start_test():
+    global targets
+    targets = 0
+    
     timer.start()
     timer2.start()
 
@@ -137,7 +140,7 @@ def start_test():
     
     place_simple_targets()
 
-def reset(event, show_stats):
+def reset(event, show_stats=False):
     # print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
     
     button.place_forget()
@@ -163,7 +166,7 @@ start_button = tk.Button(window, text="Start", width=10, height=2, highlightback
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
 #Create label
-instructions = tk.Label(window, text="Click the start button below to start. Press q at any point to quit.", font=("Helvetica", 18))
+instructions = tk.Label(window, text="Click the start button below to start", font=("Helvetica", 18))
 instructions.place(x=width//2, y=height//2-75, anchor="center")
 
 throughput_label = tk.Label(window, font=("Helvetica", 22))
@@ -181,7 +184,7 @@ def key(event):
 
 window.bind('<space>', key)
 # Bind the reset funtion to clicking q
-window.bind('q', reset)
+# window.bind('q', reset)
 
 button.bind("<Enter>", mouseover)
 
