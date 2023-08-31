@@ -40,7 +40,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: "D:\a\MouseTestingGUI\MouseTestingGUI\dist\gui.exe"
+        files: "D:/a/MouseTestingGUI/MouseTestingGUI/dist/gui.exe"
       
 
           
