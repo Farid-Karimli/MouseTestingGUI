@@ -1,12 +1,18 @@
 import tkinter as tk
+import numpy as np
 from tkinter import *
 import random
 from timer import Timer
 from fits import FitsLaw
 import math
 
+# gesture_order = "E M O D D O E M M E M E O M E O O D D D".split()
+gesture_order = "M M E E".split(" ")
+gestures = {"E": "Eyebrow Raise", "O": "Mouth Open", "D": "Dwell Time", "M": "Mouse"}
+gesture_index = 0
+
 timer = Timer()
-log = open("log.txt", "w+")
+timer2 = Timer()    
 
 global fits
 fits = None
@@ -19,13 +25,18 @@ height = 800
 
 targets = 0
 
+TRIALS = 5
+throughputs = {"Dwell Time": [], "Mouse": [], "Eyebrow Raise": [], "Mouth Open": []}
+ballistics = {"Dwell Time": [], "Mouse": [], "Eyebrow Raise": [], "Mouth Open": []}
+selects = {"Dwell Time": [], "Mouse": [], "Eyebrow Raise": [], "Mouth Open": []}
+
+
 def distance(x1, y1, x2, y2):
     return ((x1-x2)**2 + (y1-y2)**2)**0.5
 
 def place_button_randomly():
     # Record click
     checkpoint = timer.checkpoint()
-    log.write("Click " + str(checkpoint) + "\n")
 
     # Calculate Fits Law
     # print("Fits Law: " + str(fits.calculate_original_law(checkpoint)))
@@ -49,15 +60,19 @@ def place_button_randomly():
     button.place(x=random_x, y=random_y, anchor="center")
 
 def remove_button(event):
-    checkpoint = timer.checkpoint()
-    print(checkpoint)
     global targets
-
+    
+    checkpoint = timer.checkpoint()
+    #print(checkpoint)
+    
+    click_checkpoint = timer2.checkpoint()
+    #print(click_checkpoint)
+    fits.time_to_select += [click_checkpoint]
     
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     fits.to = event.widget.winfo_rootx(), event.widget.winfo_rooty()
     fits.select = x,y
-    print(fits)
+    #print(fits)
     fits.update()
     fits.f = x,y
     fits.times += [checkpoint]
@@ -65,9 +80,9 @@ def remove_button(event):
     targets += 1
 
     if targets == 10:
-        print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
         event.widget.place_forget()
-        return
+        reset(None, True)
+
 
     event.widget.place_forget()
 
@@ -102,6 +117,8 @@ def place_simple_targets():
             target = tk.Button(window, text="Target", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
             target.place(x=100*i, y=100*j, anchor="center")
             target.bind("<1>", remove_button)
+            target.bind("<Enter>", mouseover)
+
 
 
 def increase_size():
@@ -112,25 +129,67 @@ def increase_size():
 def decrease_size():
     button.config(width=button.winfo_width()-1, height=button.winfo_height()-1)
 
-
 def start_test():
+    global targets
+    targets = 0
+
     timer.start()
+    timer2.start()
+
+    throughput_label.place_forget()
+    ballistic_time_label.place_forget()
+    select_time_label.place_forget()
     start_button.place_forget()
+    instructions.place_forget()
+    gesture_label.place_forget()
+
     # Get cursor's current x and y coordinates
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     dist = distance(x, y, width//2, 50)
     global fits
     fits = FitsLaw(8, dist)
     fits.f = (x,y)
-    middle = (width//2 , height//2)
-    #button.place(x=middle[0], y=middle[1], anchor="center")
-
+    
     place_simple_targets()
 
-def reset(event):
-    print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
+def reset(event, show_stats=False):
+    # print("Fits modified:", fits.calculate_modified_law(timer.checkpoint()))
+    
     button.place_forget()
     start_button.place(x=width//2, y=height//2+75, anchor="center")
+
+    if show_stats:
+        stats = fits.get_average_times()
+        throughput = fits.calculate_modified_law(timer.checkpoint())
+
+        global throughputs, ballistics, selects, gestures, gesture_order, gesture_index
+        current_gesture = gestures[gesture_order[gesture_index]]
+        throughputs[current_gesture] += [throughput]
+        ballistics[current_gesture] += [stats[0]]
+        selects[current_gesture] += [stats[1]]
+
+        '''throughput_label.config(text=f"Throughput: {round(throughput,2)}")
+        ballistic_time_label.config(text=f"Average time to get to target: {round(stats[0],2)}ms")
+        select_time_label.config(text=f"Average time to select target: {round(stats[1],2)}ms")
+
+        throughput_label.place(x=width//2, y=height//2-110, anchor="center")
+        ballistic_time_label.place(x=width//2, y=height//2-75, anchor="center")
+        select_time_label.place(x=width//2, y=height//2-50, anchor="center")
+        '''
+        gesture_index += 1
+
+        if gesture_index == len(gesture_order):
+            print("Finished all gestures")
+            # Create a file and write the averages to it
+            with open("results.txt", "w") as f:
+                f.write("Gesture, Throughput, Ballistic Time, Select Time\n")
+                for gesture in gestures:
+                    gesture_name = gestures[gesture]
+                    f.write(f"{gesture}, {round(np.mean(throughputs[gesture_name]),2)}, {round(np.mean(ballistics[gesture_name]),2)}, {round(np.mean(selects[gesture_name]),2)}\n")
+            
+        else:
+            gesture_label.config(text="Gesture: " + gestures[gesture_order[gesture_index]])
+            gesture_label.place(x=width//2, y=height//2-150, anchor="center")
 
 
 
@@ -139,19 +198,31 @@ button = tk.Button(window, text="Target", width=8, height=2, highlightbackground
 start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20),command=start_test)
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
+#Create label
+instructions = tk.Label(window, text="Click the start button below to start", font=("Helvetica", 18))
+instructions.place(x=width//2, y=height//2-75, anchor="center")
+
+throughput_label = tk.Label(window, font=("Helvetica", 22))
+ballistic_time_label = tk.Label(window, font=("Helvetica", 18))
+select_time_label    = tk.Label(window, font=("Helvetica", 18))
+
+gesture_label = tk.Label(window, text="Gesture: " + gestures[gesture_order[gesture_index]], font=("Helvetica", 18))
+gesture_label.place(x=width//2, y=height//2-150, anchor="center")
+
 def mouseover(event):
-    fits.to = button.winfo_rootx(), button.winfo_rooty()
+    enter_checkpoint = timer2.checkpoint()
+    #print(enter_checkpoint)
+    fits.ballistic_times += [enter_checkpoint]
+
 
 def key(event):
     window.event_generate('<Motion>', warp=True, x=width//2, y=height//2)
 
 window.bind('<space>', key)
 # Bind the reset funtion to clicking q
-window.bind('q', reset)
+# window.bind('q', reset)
 
 button.bind("<Enter>", mouseover)
 
 window.geometry(f'{width}x{height}-5+40')
 window.mainloop()
-
-print(fits.calculate_modified_law(timer.checkpoint()))
