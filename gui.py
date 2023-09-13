@@ -34,11 +34,8 @@ trial = 0
 TRIALS = 5
 BLOCKS = 3
 
-
 def distance(x1, y1, x2, y2):
     return ((x1-x2)**2 + (y1-y2)**2)**0.5
-
-
 
 def remove_button(event):
     global targets
@@ -63,7 +60,6 @@ def remove_button(event):
     if targets == 10:
         global trial
         trial += 1
-
         event.widget.place_forget()
         reset(None, True)
 
@@ -127,6 +123,7 @@ def start_test():
     instructions.place_forget()
     gesture_label.place_forget()
 
+
     # Get cursor's current x and y coordinates
     x,y = window.winfo_pointerx(), window.winfo_pointery()
     dist = distance(x, y, width//2, 50)
@@ -138,13 +135,14 @@ def start_test():
 
 def reset(event, show_stats=False):
     global throughputs, ballistics, selects, gestures, trial, block
-    
+
     button.place_forget()
     start_button.place(x=width//2, y=height//2+75, anchor="center")
 
     if show_stats:
         stats = fits.get_average_times()
         throughput = fits.calculate_modified_law(timer.checkpoint())
+
 
         current_gesture = "Gesture " + str(block+1)
         throughputs[current_gesture] += [throughput]
@@ -187,9 +185,9 @@ def reset(event, show_stats=False):
                 for block in range(BLOCKS):
                     gesture_name = "Gesture " + str(block+1)
                     f.write(f"{gesture_name}, {round(np.mean(throughputs[gesture_name]),2)}, {round(np.mean(ballistics[gesture_name]),2)}, {round(np.mean(selects[gesture_name]),2)}\n")
-
-
-
+                  
+                  
+                  
 
 button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="white", font=("Arial", 15))
 
