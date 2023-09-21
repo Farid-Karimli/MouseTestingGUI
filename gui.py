@@ -31,8 +31,8 @@ targets = 0
 block = 0
 trial = 0
 
-TRIALS = 2
-BLOCKS = 2
+TRIALS = 5
+BLOCKS = 3
 
 buttons_d = {}
 
