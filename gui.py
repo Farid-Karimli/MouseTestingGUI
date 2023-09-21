@@ -31,14 +31,19 @@ targets = 0
 block = 0
 trial = 0
 
-TRIALS = 5
-BLOCKS = 3
+TRIALS = 2
+BLOCKS = 2
+
+buttons_d = {}
 
 def distance(x1, y1, x2, y2):
     return ((x1-x2)**2 + (y1-y2)**2)**0.5
 
 def remove_button(event):
     global targets
+
+    if buttons_d[targets] != event.widget: # Can't click on this button
+        return
     
     checkpoint = timer.checkpoint()
     #print(checkpoint)
@@ -91,13 +96,15 @@ def place_directional_targets():
 
     
 def place_simple_targets():
-
+    x = 0
     for j in [2,4]:
         for i in range(1,10,2):
-            target = tk.Button(window, text="Target", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
+            target = tk.Button(window, text=f"Target {x+1}", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
+            buttons_d[x] = target
             target.place(x=100*i, y=100*j, anchor="center")
             target.bind("<1>", remove_button)
             target.bind("<Enter>", mouseover)
+            x+=1
 
 
 
@@ -139,6 +146,10 @@ def reset(event, show_stats=False):
     button.place_forget()
     start_button.place(x=width//2, y=height//2+75, anchor="center")
 
+    # Show how many trials left in this block
+    instructions.config(text=f"Trial {trial} of {TRIALS} for this gesture")
+    instructions.place(x=width//2, y=height//2-75, anchor="center")
+
     if show_stats:
         stats = fits.get_average_times()
         throughput = fits.calculate_modified_law(timer.checkpoint())
@@ -160,15 +171,15 @@ def reset(event, show_stats=False):
             print(average_throughput, average_ballistic, average_select)
 
             throughput_label.config(text=f"Throughput: {round(average_throughput,2)}")
-            ballistic_time_label.config(text=f"Average time to get to target: {round(average_ballistic,2)}ms")
-            select_time_label.config(text=f"Average time to select target: {round(average_select,2)}ms")
+            ballistic_time_label.config(text=f"Average time to get to target: {round(average_ballistic,2)} ms")
+            select_time_label.config(text=f"Average time to select target: {round(average_select,2)} ms")
 
-            throughput_label.place(x=width//2, y=height//2-110, anchor="center")
+            throughput_label.place(x=width//2, y=height//2-115, anchor="center")
             ballistic_time_label.place(x=width//2, y=height//2-85, anchor="center")
             select_time_label.place(x=width//2, y=height//2-60, anchor="center")
 
             gesture_label.config(text=f"Gesture {block} complete. Click start to begin next gesture.")
-            gesture_label.place(x=width//2, y=height//2, anchor="center")
+            gesture_label.place(x=width//2, y=height//2-5, anchor="center")
 
             
 
@@ -206,9 +217,9 @@ gesture_label = tk.Label(window, text="Gesture 1", font=("Helvetica", 18))
 # gesture_label.place(x=width//2, y=height//2-150, anchor="center")
 
 def mouseover(event):
-    enter_checkpoint = timer2.checkpoint()
-    #print(enter_checkpoint)
-    fits.ballistic_times += [enter_checkpoint]
+    if event.widget == buttons_d[targets]:
+        enter_checkpoint = timer2.checkpoint()
+        fits.ballistic_times += [enter_checkpoint]
 
 
 def key(event):
