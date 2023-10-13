@@ -13,6 +13,8 @@ throughputs = {"Gesture 1": [],  "Gesture 2": [], "Gesture 3": []}
 ballistics = {"Gesture 1": [], "Gesture 2": [], "Gesture 3": []}
 selects = {"Gesture 1": [],  "Gesture 2": [], "Gesture 3": []}
 
+
+
 gestures = {"E": "Eyebrow Raise", "O": "Mouth Open", "D": "Dwell Time", "M": "Mouse"}
 
 timer = Timer()
@@ -71,7 +73,6 @@ def remove_button(event):
 
     event.widget.place_forget()
 
-# Places 10 buttons in a circle around the center of the screen
 def place_directional_targets():
 
     top_left_corner = (width//2 , height//2 )
@@ -106,7 +107,19 @@ def place_simple_targets():
             target.bind("<Enter>", mouseover)
             x+=1
 
+def place_circle_targets():
+    # Place 10 targets in a circle around the center of the screen
 
+    for i in range(10):
+        arc = i*36
+        x = width//2 + 350*math.cos(math.radians(arc))
+        y = height//2 + 350*math.sin(math.radians(arc))
+
+        target = tk.Button(window, text=f"Target {i+1}", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
+        buttons_d[i] = target
+        target.place(x=x, y=y, anchor="center")
+        target.bind("<1>", remove_button)
+        target.bind("<Enter>", mouseover)
 
 def increase_size():
     width = button.winfo_width()
@@ -138,7 +151,7 @@ def start_test():
     fits = FitsLaw(8, dist)
     fits.f = (x,y)
     
-    place_simple_targets()
+    place_circle_targets()
 
 def reset(event, show_stats=False):
     global throughputs, ballistics, selects, gestures, trial, block
