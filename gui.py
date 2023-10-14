@@ -7,6 +7,7 @@ from timer import Timer
 from fits import FitsLaw
 import math
 
+movement_log = open("movement_log.txt", "w")
 
 # Create a dictionary of gestures and their corresponding numbers
 throughputs = {"Gesture 1": [],  "Gesture 2": [], "Gesture 3": []}
@@ -47,6 +48,8 @@ def remove_button(event):
     if buttons_d[targets] != event.widget: # Can't click on this button
         return
     
+    # Write click to movement log
+
     checkpoint = timer.checkpoint()
     #print(checkpoint)
     
@@ -55,6 +58,9 @@ def remove_button(event):
     fits.time_to_select += [click_checkpoint]
     
     x,y = window.winfo_pointerx(), window.winfo_pointery()
+
+    movement_log.write(f"Click at ({x}, {y}) target {targets}\n")
+
     fits.to = event.widget.winfo_rootx(), event.widget.winfo_rooty()
     fits.select = x,y
     #print(fits)
@@ -234,9 +240,18 @@ def mouseover(event):
         enter_checkpoint = timer2.checkpoint()
         fits.ballistic_times += [enter_checkpoint]
 
+        
+
 
 def key(event):
     window.event_generate('<Motion>', warp=True, x=width//2, y=height//2)
+
+
+def motion(event):
+    x, y = event.x, event.y
+    movement_log.write(f"{x}, {y}\n")
+
+window.bind('<Motion>', motion)
 
 window.bind('<space>', key)
 # Bind the reset funtion to clicking q
