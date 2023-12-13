@@ -39,8 +39,8 @@ window.title("Testing GUI")
 width = window.winfo_width()
 height = window.winfo_height()'''
 
-width = 1200
-height = 1000
+width = 1500
+height = 800
 
 
 
@@ -161,10 +161,10 @@ def place_circle_targets():
 
     for i in range(10):
         arc = i*36
-        x = width//2+50 + 350*math.cos(math.radians(arc))
-        y = height//2+100 + 350*math.sin(math.radians(arc))
+        x = width//2+70 + 350*math.cos(math.radians(arc))
+        y = height//2 + 350*math.sin(math.radians(arc))
 
-        target = tk.Button(window, text=f"Target {i+1}", width=12, height=4, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
+        target = tk.Button(window, text=f"Target {i+1}", width=12, height=4, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 16))
         buttons_d += [target]
         target.place(x=x, y=y, anchor="center")
         target.bind("<1>", lambda event, id=i: remove_button(event, id))
@@ -306,8 +306,8 @@ change_gesture_button = tk.Button(window, text="Change Gesture", width=20, heigh
 change_gesture_button.place(x=width//2, y=height//2+170, anchor="center")
 
 # button to reset in the top right corner
-reset_button = tk.Button(window, text="Reset", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20), command=lambda : reset(None, True))
-reset_button.place(x=width-100, y=0, anchor="ne")
+reset_button = tk.Button(window, text="Reset", width=8, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20), command=lambda : reset(None, True))
+reset_button.place(x=width-20, y=0, anchor="ne")
 
 def mouseover(event, button_id):
     if event.widget == buttons_d[targets]:
