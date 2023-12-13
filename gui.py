@@ -63,15 +63,22 @@ def pause(event):
     stats2_log.write(f"Pause\n")
     stats_log.write(f"Pause\n")
 
+    pause_button.config(text="Paused!")
+
+
 def continue_timer(event):
     print("Continued")
     timer.continue_timer()
     timer2.continue_timer()
+    continue_button.config(text="Continuing...")
 
 def change_gesture():
     runs_log.write(f"Change Gesture\n")
     stats2_log.write(f"Change Gesture\n")
     stats_log.write(f"Change Gesture\n")
+
+    change_gesture_button.config(text="Changed!")
+
 
 
 def remove_button(event, button_id):
@@ -172,16 +179,13 @@ def place_circle_targets():
 
 
     # place a pause button in the top left of the screen
-    pause_button = tk.Button(window, text="Pause", width=8, height=2, highlightbackground='red', bg='blue', fg="white", font=("Arial", 15))
     pause_button.place(x=100, y=50, anchor="center")
 
-    pause_button.bind("<1>", pause)
+    
 
     # place a continue button next to the pause button
-    continue_button = tk.Button(window, text="Continue", width=6, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 15))
     continue_button.place(x=200, y=50, anchor="center")
 
-    continue_button.bind("<1>", continue_timer)
 
     
 def increase_size():
@@ -294,6 +298,15 @@ button = tk.Button(window, text="Target", width=8, height=2, highlightbackground
 start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20),command=start_test)
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
+pause_button = tk.Button(window, text="Pause", width=8, height=2, highlightbackground='red', bg='blue', fg="white", font=("Arial", 15))
+pause_button.bind("<1>", pause)
+pause_button.bind("p", pause)
+
+
+continue_button = tk.Button(window, text="Continue", width=6, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 15))
+continue_button.bind("<1>", continue_timer)
+continue_button.bind('c', continue_timer)
+
 #Create label
 instructions = tk.Label(window, text="Click the start button below to start", font=("Helvetica", 18))
 instructions.place(x=width//2, y=height//2-75, anchor="center")
@@ -333,9 +346,10 @@ window.bind('<Motion>', motion)
 
 window.bind('<space>', key)
 # Bind the reset funtion to clicking q
-# window.bind('q', reset)
-
 button.bind("<Enter>", mouseover)
+
+'''window.bind('<P>', lambda event: pause(event))
+window.bind('<C>', lambda event: continue_timer(event))'''
 
 window.geometry(f'{width}x{height}')
 window.mainloop()
