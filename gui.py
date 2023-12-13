@@ -15,7 +15,7 @@ stats_log.write("Time, Click X, Click Y, Target X, Target Y, Target Number, Dist
 stats2_log = open("stats2_log.txt", "w")
 
 runs_log = open("runs_log.csv", "w")
-runs_log.write("Run, Throughput, Ballistic Time, Select Time\n")
+runs_log.write("Run, Throughput, Ballistic Time, Select Time, Number of Targets\n")
 
 # Create a dictionary of gestures and their corresponding numbers
 throughputs = {"Gesture 1": [],  "Gesture 2": [], "Gesture 3": []}
@@ -41,7 +41,7 @@ trial = 0
 TRIALS = 5
 BLOCKS = 3
 
-buttons_d = {}
+buttons_d = []
 
 def distance(x1, y1, x2, y2):
     return ((x1-x2)**2 + (y1-y2)**2)**0.5
@@ -147,6 +147,7 @@ def place_simple_targets():
 
 def place_circle_targets():
     # Place 10 targets in a circle around the center of the screen
+    global buttons_d
 
     for i in range(10):
         arc = i*36
@@ -154,7 +155,7 @@ def place_circle_targets():
         y = height//2 + 350*math.sin(math.radians(arc))
 
         target = tk.Button(window, text=f"Target {i+1}", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
-        buttons_d[i] = target
+        buttons_d += [target]
         target.place(x=x, y=y, anchor="center")
         target.bind("<1>", lambda event, id=i: remove_button(event, id))
         target.bind("<Enter>", lambda event, id=i: mouseover(event, id))
@@ -205,9 +206,16 @@ def start_test():
     
     place_circle_targets()
 
-def reset(event, show_stats=False):
-        global throughputs, ballistics, selects, gestures, trial, block
+def reset(event, remove_buttons=False):
+        global throughputs, ballistics, selects, gestures, trial, block, buttons_d, targets
 
+        if remove_buttons:
+            print("removing buttons")
+            for button in buttons_d:
+                button.place_forget()
+            buttons_d.clear()
+            
+                
         button.place_forget()
         start_button.place(x=width//2, y=height//2+75, anchor="center")
 
@@ -226,7 +234,7 @@ def reset(event, show_stats=False):
         selects[current_gesture] += [stats[1]]
 
         # Write to runs log
-        runs_log.write(f"{trial+1}, {throughput}, {stats[0]}, {stats[1]}\n")
+        runs_log.write(f"{trial+1}, {throughput}, {stats[0]}, {stats[1]}, {targets}\n")
 
         
         ''' if trial == TRIALS: 
@@ -286,6 +294,10 @@ select_time_label    = tk.Label(window, font=("Helvetica", 18))
 
 change_gesture_button = tk.Button(window, text="Change Gesture", width=20, height=2, highlightbackground='red', bg='pink', fg="black", font=("Arial", 20), command=change_gesture)
 change_gesture_button.place(x=width//2, y=height//2+170, anchor="center")
+
+# button to reset in the top right corner
+reset_button = tk.Button(window, text="Reset", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20), command=lambda : reset(None, True))
+reset_button.place(x=width-100, y=0, anchor="ne")
 
 def mouseover(event, button_id):
     if event.widget == buttons_d[targets]:
