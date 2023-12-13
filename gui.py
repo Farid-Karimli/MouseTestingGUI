@@ -6,15 +6,19 @@ import random
 from timer import Timer
 from fits import FitsLaw
 import math
+import datetime
 
-movement_log = open("movement_log.txt", "w")
+TODAY_DATE = datetime.datetime.today().strftime("%d-%m-%Y-%H:%M")
+print(TODAY_DATE)
 
-stats_log = open("stats_log.csv", "w")
+movement_log = open(f"movement_log_{TODAY_DATE}", "w")
+
+stats_log = open(f"stats_log_{TODAY_DATE}.csv", "w")
 stats_log.write("Time, Click X, Click Y, Target X, Target Y, Target Number, Distance to TargetX, Distance to TargetY, Select X, Select Y, From X, From Y\n")
 
-stats2_log = open("stats2_log.txt", "w")
+stats2_log = open(f"stats2_log_{TODAY_DATE}.txt", "w")
 
-runs_log = open("runs_log.csv", "w")
+runs_log = open(f"runs_log_{TODAY_DATE}.csv", "w")
 runs_log.write("Run, Throughput, Ballistic Time, Select Time, Number of Targets\n")
 
 # Create a dictionary of gestures and their corresponding numbers
