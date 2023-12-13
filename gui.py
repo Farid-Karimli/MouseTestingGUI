@@ -35,8 +35,14 @@ selection_coordinates = []
 
 window = tk.Tk()
 window.title("Testing GUI")
-width = 1000
-height = 800
+'''window.attributes('-fullscreen',True)
+width = window.winfo_width()
+height = window.winfo_height()'''
+
+width = 1200
+height = 1000
+
+
 
 targets = 0
 block = 0
@@ -155,10 +161,10 @@ def place_circle_targets():
 
     for i in range(10):
         arc = i*36
-        x = width//2 + 350*math.cos(math.radians(arc))
-        y = height//2 + 350*math.sin(math.radians(arc))
+        x = width//2+50 + 350*math.cos(math.radians(arc))
+        y = height//2+100 + 350*math.sin(math.radians(arc))
 
-        target = tk.Button(window, text=f"Target {i+1}", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
+        target = tk.Button(window, text=f"Target {i+1}", width=12, height=4, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
         buttons_d += [target]
         target.place(x=x, y=y, anchor="center")
         target.bind("<1>", lambda event, id=i: remove_button(event, id))
@@ -172,7 +178,7 @@ def place_circle_targets():
     pause_button.bind("<1>", pause)
 
     # place a continue button next to the pause button
-    continue_button = tk.Button(window, text="Continue", width=8, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 15))
+    continue_button = tk.Button(window, text="Continue", width=6, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 15))
     continue_button.place(x=200, y=50, anchor="center")
 
     continue_button.bind("<1>", continue_timer)
@@ -331,7 +337,7 @@ window.bind('<space>', key)
 
 button.bind("<Enter>", mouseover)
 
-window.geometry(f'{width}x{height}-5+40')
+window.geometry(f'{width}x{height}')
 window.mainloop()
 stats_log.close()
 runs_log.close()
