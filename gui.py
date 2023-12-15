@@ -8,11 +8,11 @@ from fits import FitsLaw
 import math
 import datetime
 
-TODAY_DATE = datetime.datetime.today().strftime("%d-%m-%Y-%H:%M")
+TODAY_DATE = datetime.datetime.today().strftime("%d-%m-%Y-%H-%M")
 print(TODAY_DATE)
 
-movement_log = open(f"movement_log_{TODAY_DATE}", "w")
-
+movement_log = open(f"movement_log_{TODAY_DATE}" + ".txt", "w")
+ 
 stats_log = open(f"stats_log_{TODAY_DATE}.csv", "w")
 stats_log.write("Time, Click X, Click Y, Target X, Target Y, Target Number, Distance to TargetX, Distance to TargetY, Select X, Select Y, From X, From Y\n")
 
