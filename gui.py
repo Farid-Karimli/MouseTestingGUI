@@ -9,7 +9,6 @@ import math
 import datetime
 
 TODAY_DATE = datetime.datetime.today().strftime("%d-%m-%Y-%H-%M")
-print(TODAY_DATE)
 
 movement_log = open(f"movement_log_{TODAY_DATE}" + ".txt", "w")
 
@@ -38,8 +37,16 @@ selection_coordinates = []
 window = tk.Tk()
 window.title("Testing GUI")
 
-width = 1500
-height = 900
+
+
+# get screen size
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+
+# set window size to 80% of screen size
+width = int(screen_width * 0.8)
+height = int(screen_height * 0.7)
+
 
 # UNUSED
 TARGETS = 0
@@ -78,10 +85,6 @@ def change_gesture():
 
 def remove_button(event, button_id):
     global TARGETS
-
-    print("This is the button id: ", button_id)
-    '''if buttons_dict[TARGETS] != event.widget: # Can't click on this button
-        return'''
     
     # Write click to movement log
     x,y = window.winfo_pointerx(), window.winfo_pointery()
@@ -94,7 +97,6 @@ def remove_button(event, button_id):
     
     click_checkpoint = timer2.get_elapsed()
     timer2.start()
-    #print(click_checkpoint)
     fits.time_to_select += [click_checkpoint]
     
     secondary_stats_log.write(f"Select: {button_id}, {x}, {y}, {click_checkpoint}, {fits.f}\n")
@@ -112,49 +114,6 @@ def remove_button(event, button_id):
 
     fits.f = x,y
     
-    TARGETS += 1
-
-    if TARGETS == 10:
-        global TRIAL
-        TRIAL += 1
-        event.widget.place_forget()
-        reset(None, True)
-
-    event.widget.place_forget()
-
-def remove_button2(event, button_id):
-    # do the same as remove_button, but for the first button - start the timer. For the last button, stop the timer. For all other buttons, end timer, do fits law, and start timer again
-    global TARGETS
-
-    print("This is the button id: ", button_id)
-    '''if buttons_dict[TARGETS] != event.widget: # Can't click on this button
-        return'''
-    
-    # Write click to movement log
-    x,y = window.winfo_pointerx(), window.winfo_pointery()
-    movement_log.write(
-        f"Click at ({x}, {y}) target {TARGETS}. Time: {timer.get_elapsed()}\n")
-    
-    checkpoint = timer.stop()
-    timer.start()
-    print("checkpoint:", checkpoint)
-    
-    click_checkpoint = timer2.get_elapsed()
-    timer2.start()
-    #print(click_checkpoint)
-    fits.time_to_select += [click_checkpoint]
-
-    secondary_stats_log.write(f"Select: {button_id}, {x}, {y}, {click_checkpoint}, {fits.f}\n")
-
-    fits.to = event.widget.winfo_rootx(), event.widget.winfo_rooty()
-    fits.select = x,y
-
-    # write stats to stats log
-    
-    fits.update()
-    fits.f = x, y
-    fits.times += [checkpoint]
-
     TARGETS += 1
 
     if TARGETS == 10:
@@ -214,20 +173,20 @@ def place_circle_targets():
         
 
         arc = i*36
-        x = width//2+70 + 350*math.cos(math.radians(arc))
-        y = height//2 + 350*math.sin(math.radians(arc))
+        x = width//2 + (width*0.25)*math.cos(math.radians(arc))
+        y = height//2 + (height*0.4)*math.sin(math.radians(arc))
 
         target = tk.Button(window, text=f"{number}", width=3,  highlightbackground='black',
-                           bg="black", fg="white", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
+                           bg="black", fg="black", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
         buttons_dict[number] = target
+        # place the button so that it doesn't go off the screen
         target.place(x=x, y=y, anchor="center")
         target.bind("<1>", lambda event, id=number: remove_button(event, id))
         target.bind("<Enter>", lambda event, id=number: mouseover(event, id))
 
         prev_number = number
-    # place a pause button in the top left of the screen
+
     #pause_button.place(x=100, y=50, anchor="center")
-    print(buttons_dict)
     # place a continue button next to the pause button
     #continue_button.place(x=200, y=50, anchor="center")
 
@@ -333,16 +292,16 @@ def reset(event, remove_buttons=False):
                     f.write(f"{gesture_name}, {round(np.mean(throughputs[gesture_name]),2)}, {round(np.mean(ballistics[gesture_name]),2)}, {round(np.mean(selects[gesture_name]),2)}\n")
                   """
                   
-button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="white", font=("Arial", 15))
+button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="black", font=("Arial", 15))
 
-start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20),command=start_test)
+start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="black", font=("Arial", 20),command=start_test)
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
-pause_button = tk.Button(window, text="Pause", width=8, height=2, highlightbackground='red', bg='blue', fg="white", font=("Arial", 15))
+pause_button = tk.Button(window, text="Pause", width=8, height=2, highlightbackground='red', bg='blue', fg="black", font=("Arial", 15))
 pause_button.bind("<1>", pause)
 pause_button.bind("p", pause)
 
-continue_button = tk.Button(window, text="Continue", width=8, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 15))
+continue_button = tk.Button(window, text="Continue", width=8, height=2, highlightbackground='red', bg='green', fg="black", font=("Arial", 15))
 continue_button.bind("<1>", continue_timer)
 continue_button.bind('c', continue_timer)
 
@@ -358,7 +317,7 @@ change_gesture_button = tk.Button(window, text="Change Gesture", width=20, heigh
 change_gesture_button.place(x=width//2, y=height//2+170, anchor="center")
 
 # button to reset in the top right corner
-reset_button = tk.Button(window, text="Reset", width=8, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20), command=lambda : reset(None, True))
+reset_button = tk.Button(window, text="Reset", width=8, height=2, highlightbackground='red', bg='red', fg="black", font=("Arial", 20), command=lambda : reset(None, True))
 reset_button.place(x=width-20, y=0, anchor="ne")
 
 def mouseover(event, button_id):
@@ -378,9 +337,7 @@ def motion(event):
     movement_log.write(f"{x}, {y}\n")
 
 window.bind('<Motion>', motion)
-
 window.bind('<space>', key)
-# Bind the reset funtion to clicking q
 button.bind("<Enter>", mouseover)
 
 window.geometry(f'{width}x{height}')
