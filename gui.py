@@ -132,7 +132,7 @@ def place_directional_targets():
     # place button in top left corner
     button.place(x=top_left_corner[0], y=top_left_corner[1], anchor="center")
     
-    newbutton = tk.Button(window, text="New", width=10, height=2, highlightbackground='red', bg='green', fg="black", font=("Arial", 20))
+    newbutton = tk.Button(window, text="New", width=10, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 20))
 
     # Places 3 buttons in a circle around the center of the screen 200 pixels away at 45 degree intervals
     arc = 0
@@ -142,7 +142,7 @@ def place_directional_targets():
         y = top_left_corner[1] + 200*math.sin(math.radians(arc))
         print("new x: ", x, "new y: ", y)
 
-        newbutton = tk.Button(window, text="New", width=8, height=2, highlightbackground='red', bg='green', fg="black", font=("Arial", 20))
+        newbutton = tk.Button(window, text="New", width=8, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 20))
         newbutton.bind("<1>", remove_button)
         newbutton.place(x=x, y=y, anchor="center")
 
@@ -150,7 +150,7 @@ def place_simple_targets():
     x = 0
     for j in [2,4]:
         for i in range(1,10,2):
-            target = tk.Button(window, text=f"Target {x+1}", width=8, height=2, highlightbackground='gray', bg="gray", fg="black", font=("Arial", 15))
+            target = tk.Button(window, text=f"Target {x+1}", width=8, height=2, highlightbackground='gray', bg="gray", fg="white", font=("Arial", 15))
             buttons_dict[x] = target
             target.place(x=100*i, y=100*j, anchor="center")
             target.bind("<1>", remove_button)
@@ -177,7 +177,7 @@ def place_circle_targets():
         y = height//2 + (height*0.4)*math.sin(math.radians(arc))
 
         target = tk.Button(window, text=f"{number}", width=3,  highlightbackground='black',
-                           bg="black", fg="black", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
+                           bg="black", fg="white", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
         buttons_dict[number] = target
         # place the button so that it doesn't go off the screen
         target.place(x=x, y=y, anchor="center")
@@ -292,16 +292,16 @@ def reset(event, remove_buttons=False):
                     f.write(f"{gesture_name}, {round(np.mean(throughputs[gesture_name]),2)}, {round(np.mean(ballistics[gesture_name]),2)}, {round(np.mean(selects[gesture_name]),2)}\n")
                   """
                   
-button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="black", font=("Arial", 15))
+button = tk.Button(window, text="Target", width=8, height=2, highlightbackground='#3E4149', fg="white", font=("Arial", 15))
 
-start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="black", font=("Arial", 20),command=start_test)
+start_button = tk.Button(window, text="Start", width=10, height=2, highlightbackground='red', bg='red', fg="white", font=("Arial", 20),command=start_test)
 start_button.place(x=width//2, y=height//2+75, anchor="center")
 
-pause_button = tk.Button(window, text="Pause", width=8, height=2, highlightbackground='red', bg='blue', fg="black", font=("Arial", 15))
+pause_button = tk.Button(window, text="Pause", width=8, height=2, highlightbackground='red', bg='blue', fg="white", font=("Arial", 15))
 pause_button.bind("<1>", pause)
 pause_button.bind("p", pause)
 
-continue_button = tk.Button(window, text="Continue", width=8, height=2, highlightbackground='red', bg='green', fg="black", font=("Arial", 15))
+continue_button = tk.Button(window, text="Continue", width=8, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 15))
 continue_button.bind("<1>", continue_timer)
 continue_button.bind('c', continue_timer)
 
