@@ -12,6 +12,9 @@ TODAY_DATE = datetime.datetime.today().strftime("%d-%m-%Y-%H-%M")
 
 movement_log = open(f"movement_log_{TODAY_DATE}" + ".txt", "w")
 
+# the arrangement is randomized, starting from the default position of 1
+arrangement_start = 1
+
 # LOGS
  
 stats_log = open(f"stats_log_{TODAY_DATE}.csv", "w")
@@ -20,7 +23,7 @@ stats_log.write("Time, Click X, Click Y, Target X, Target Y, Target Number, Dist
 secondary_stats_log = open(f"secondary_stats_log_{TODAY_DATE}.txt", "w")
 
 runs_log = open(f"runs_log_{TODAY_DATE}.csv", "w")
-runs_log.write("Run, Throughput, Ballistic Time, Select Time, Number of TARGETS\n")
+runs_log.write("Run, Throughput, Ballistic Time, Select Time, Number of TARGETS, Type of Arrangement\n")
 
 # Create a dictionary of gestures and their corresponding numbers - UNUSED
 throughputs = {"Gesture 1": [],  "Gesture 2": [], "Gesture 3": []}
@@ -157,9 +160,11 @@ def place_simple_targets():
             target.bind("<Enter>", mouseover)
             x+=1
 
-def place_circle_targets():
-    # Place 10 TARGETS in a circle around the center of the screen
+def place_circle_targets(start):
+    # Place 10 TARGETS in a circle around the center of the screen, where the first target is at the position start
     global buttons_dict
+
+    addition = start - 1
 
     for i in range(10):
         if i == 0:
@@ -171,16 +176,18 @@ def place_circle_targets():
         else:
             number = prev_number + 2
         
-
-        arc = i*36
+        arc = (i+addition)*36
         x = width//2 + (width*0.25)*math.cos(math.radians(arc))
         y = height//2 + (height*0.4)*math.sin(math.radians(arc))
+        print(x,y)
 
         target = tk.Button(window, text=f"{number}", width=3,  highlightbackground='black',
-                           bg="black", fg="white", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
+                           bg="black", fg="black", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
         buttons_dict[number] = target
         # place the button so that it doesn't go off the screen
         target.place(x=x, y=y, anchor="center")
+        window.update()
+        #print(target.winfo_width(), target.winfo_height())
         target.bind("<1>", lambda event, id=number: remove_button(event, id))
         target.bind("<Enter>", lambda event, id=number: mouseover(event, id))
 
@@ -199,7 +206,7 @@ def decrease_size():
     button.config(width=button.winfo_width()-1, height=button.winfo_height()-1)
 
 def start_test():
-    global TARGETS
+    global TARGETS, arrangement_start
     TARGETS = 0
 
     # timer.start()
@@ -219,10 +226,11 @@ def start_test():
     fits = FitsLaw(8, dist)
     fits.f = (x,y)
     
-    place_circle_targets()
+    arrangement_start = random.randint(1,10)
+    place_circle_targets(arrangement_start)
 
 def reset(event, remove_buttons=False):
-        global throughputs, ballistics, selects, gestures, TRIAL, BLOCK, buttons_dict, TARGETS
+        global throughputs, ballistics, selects, gestures, TRIAL, BLOCK, buttons_dict, TARGETS, arrangement_start
 
         if remove_buttons:
             print("removing buttons")
@@ -249,7 +257,7 @@ def reset(event, remove_buttons=False):
         selects[current_gesture] += [stats[1]]
 
         # Write to runs log
-        runs_log.write(f"{TRIAL+1}, {throughput}, {stats[0]}, {stats[1]}, {TARGETS}\n")
+        runs_log.write(f"{TRIAL+1}, {throughput}, {stats[0]}, {stats[1]}, {TARGETS}, {arrangement_start}\n")
 
         
         ''' if TRIAL == TRIALS: 
@@ -331,6 +339,7 @@ def mouseover(event, button_id):
     
 def key(event):
     window.event_generate('<Motion>', warp=True, x=width//2, y=height//2)
+
 
 def motion(event):
     x, y = event.x, event.y
