@@ -131,7 +131,6 @@ def remove_button(event, button_id):
 def place_directional_targets():
 
     top_left_corner = (width//2 , height//2 )
-    print("top left corner: ", top_left_corner)
     # place button in top left corner
     button.place(x=top_left_corner[0], y=top_left_corner[1], anchor="center")
     
@@ -143,7 +142,6 @@ def place_directional_targets():
         arc += 45
         x = top_left_corner[0] + 200*math.cos(math.radians(arc))
         y = top_left_corner[1] + 200*math.sin(math.radians(arc))
-        print("new x: ", x, "new y: ", y)
 
         newbutton = tk.Button(window, text="New", width=8, height=2, highlightbackground='red', bg='green', fg="white", font=("Arial", 20))
         newbutton.bind("<1>", remove_button)
@@ -178,11 +176,10 @@ def place_circle_targets(start):
         
         arc = (i+addition)*36
         x = width//2 + (width*0.25)*math.cos(math.radians(arc))
-        y = height//2 + (height*0.4)*math.sin(math.radians(arc))
-        print(x,y)
+        y = height//2 + (height*0.40)*math.sin(math.radians(arc))
 
-        target = tk.Button(window, text=f"{number}", width=3,  highlightbackground='black',
-                           bg="black", fg="black", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
+        target = tk.Button(window, text=f"{number}", width=3,  highlightbackground='white',
+                           bg="black", fg="white", font=("Arial", 40), padx=0, pady=0, activebackground="gray", activeforeground="red", relief="raised")
         buttons_dict[number] = target
         # place the button so that it doesn't go off the screen
         target.place(x=x, y=y, anchor="center")
